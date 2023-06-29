@@ -67,7 +67,8 @@ class Board {
     checkButton.addEventListener("click", (e) => {
       console.log("check clicked", e);
       let data = { type: "check", data: "message from check button" };
-      wss.send(JSON.stringify(data));
+      // wss.send(JSON.stringify(data));
+      checkNumbers();
     });
 
     undoButton.addEventListener("click", (e) => {

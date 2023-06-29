@@ -4,6 +4,7 @@ import * as WebSocket from "ws";
 import dotenv from "dotenv";
 import path from "path";
 // import generateRandomNumbers from "./game";
+import { ServerGame } from "./game";
 
 // // import { config } from "./config/config";
 //
@@ -14,27 +15,35 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const SERVER_PORT = process.env.SERVER_PORT;
 
+// express.static.mime.define({ "text/css": ["css"] });
+
 app.use("/", express.static(path.resolve(__dirname, "../client")));
 
+type callbackfunction = (p: any) => any;
+
 wss.on("connection", (ws: WebSocket) => {
+  let game = new ServerGame();
+
+  let messageMap = new Map<string, callbackfunction>([
+    [
+      "create",
+      () => {
+        // game.create
+        game = new ServerGame();
+        return true;
+      },
+    ],
+    ["check", game.check],
+  ]);
+
   ws.on("message", (message: string) => {
-    let result = JSON.parse(message);
-
     if (ws.readyState === WebSocket.OPEN) {
-      if (result.type === "create") {
-        let data = { data: generateRandomNumbers(4) };
-        console.log("create new game");
+      let result = JSON.parse(message);
+      let action = messageMap.get(result.type);
 
-        ws.send(JSON.stringify(data));
-      } else if (result.type === "check") {
-        console.log("do numbers check");
-      } else if (result.type === "undo") {
-        console.log("undo selected number...maybe not need to be done here?");
-      } else if (result.type === "getCode") {
-        let data = { data: generateRandomNumbers(4) };
-        console.log("get new code...", data);
-
-        ws.send(JSON.stringify(data));
+      if (action) {
+        let res = {seq: result.seq, data: action.call(game, result.data)}
+        ws.send(JSON.stringify(res));
       }
     }
   });
