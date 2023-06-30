@@ -4,34 +4,41 @@ import { isTypedArray } from "util/types";
 export class ServerGame {
   constructor() {}
 
-  check(numbers: number[]) {
-    numbers = [2, 4, 6, 1];
-    let code = [2, 2, 3, 4];
-    let res = [];
+  check(playerGuesses: number[]) {
+    playerGuesses = [5, 4, 6, 1];
+    let code = [1, 3, 6, 2];
+    let res = Array<string>(4).fill("_");
+    let notExactMatch = new Set<number>();
 
-    for (let i =8 0; i < numbers.length; i++) {
-      const num = numbers[i];
-      console.log;
+    for (let i = 0; i < playerGuesses.length; i++) {
+      const num = playerGuesses[i];
       if (num === code[i]) {
-        res.push("x");
+        res[i] = "x";
       } else {
-        res.push("_");
+        notExactMatch.add(code[i]);
       }
     }
 
-    console.log("res", res);
-    return [true, false, true, false];
+    for (let i = 0; i < playerGuesses.length; i++) {
+      let num = playerGuesses[i];
+
+      if (res[i] != "x") {
+        res[i] = notExactMatch.has(num) ? "c" : "_";
+      }
+    }
+
+    console.log("nums", generateRandomNumbers());
+    return res;
   }
 }
 
-// function generateRandomNumbers(n: number): number[] {
-//   const array = [];
-//   for (let i = 0; i < n; i++) {
-//     array.push(Math.floor(Math.random() * n) + 1);
-//   }
-//   return array;
-// }
+function generateRandomNumbers(): number[] {
+  let arr: number[] = [1, 2, 3, 4, 5, 6];
+  let res = new Set<number>();
 
-// if (module.exports) {
-//   module.exports = generateRandomNumbers;
-// }
+  while (res.size < 4) {
+    let randomNum: number = Math.floor(Math.random() * arr.length + 1);
+    res.add(randomNum);
+  }
+  return Array.from(res);
+}
