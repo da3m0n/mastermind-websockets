@@ -10,6 +10,8 @@ class Board {
       { id: 5, pegColor: "#ffff00", pegTextColor: "#b2b230" },
       { id: 6, pegColor: "#9c27b0", pegTextColor: "#d83ef2" },
     ];
+    this.playerGuess = [];
+    this.enableBtn = false;
   }
 
   makeBoard() {
@@ -18,7 +20,31 @@ class Board {
       let rowDiv = createDom("div", { class: "row-div" });
       for (let j = 0; j < this._cols; j++) {
         let peg = createDom("div", { class: "peg" });
-        let pegInput = createDom("input", { class: "peg-input" });
+        let pegInput = createDom("input", {
+          class: "peg-input",
+          type: "number",
+          min: 1,
+          max: 6,
+        });
+
+        pegInput.addEventListener("keydown", (e) => {
+          // this.playerGuess.push(e.key);
+
+          if (e.keyCode >= 49 && e.keyCode <= 54) {
+            console.log(e.key, " ---> ", e.keyCode);
+            this.playerGuess.push(e.key);
+          } else {
+            e.preventDefault();
+            return false;
+          }
+
+          // if (this.playerGuess === 4) {
+          //   console.log("in here");
+          //   const btn = document.getElementById("checkCodeBtn");
+          //   btn.disabled = true;
+          //   this.enableBtn = true;
+          // }
+        });
         peg.appendChild(pegInput);
         rowDiv.appendChild(peg);
       }
@@ -26,7 +52,7 @@ class Board {
       rowDiv.appendChild(this.makeControls());
       rowDiv.appendChild(this.makeHints());
       inputDiv.appendChild(rowDiv);
-      // <button type="button" onClick="generateNumbers()">Generate New</button>
+      // <button type="button" .onClick="generateNumbers()">Generate New</button>
     }
 
     let grid = document.getElementsByClassName("board")[0];
@@ -38,8 +64,8 @@ class Board {
       let data = {
         type: "create",
       };
-      wss.send(JSON.stringify(data));
-      // console.log("nums: ", generateNumbers(7));
+      // wss.send(JSON.stringify(data));
+      new Game();
     });
     let boardWrapper = document.getElementsByTagName("footer")[0];
     boardWrapper.appendChild(generateNewBtn);
@@ -58,10 +84,21 @@ class Board {
 
   makeControls() {
     let controlsDiv = createDom("div", { class: "controls" });
-    let checkButton = createDom("button", { value: "check" });
+    let checkButton = createDom("button", {
+      id: "checkCodeBtn",
+      value: "check",
+      // disabled: this.enableBtn,
+    });
+
+    // checkButton.addEventListener("change", (e) => {
+    //   console.log("xxxx");
+    //   if (this.playerGuess === 4) {
+    //     console.log("chANGE BTN");
+    //   }
+    // });
     checkButton.innerHTML = "Check";
 
-    let undoButton = createDom("button", { value: "undo" });
+    let undoButton = createDom("button", { value: "undo", disabled: true });
     undoButton.innerHTML = "Undo";
 
     checkButton.addEventListener("click", (e) => {
@@ -74,7 +111,7 @@ class Board {
     undoButton.addEventListener("click", (e) => {
       console.log("undo clicked", e);
       let data = { type: "undo", data: "message from undo button" };
-      wss.send(JSON.stringify(data));
+      // wss.send(JSON.stringify(data));
     });
 
     controlsDiv.appendChild(undoButton);

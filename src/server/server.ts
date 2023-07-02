@@ -34,6 +34,7 @@ wss.on("connection", (ws: WebSocket) => {
       },
     ],
     ["check", game.check],
+    ["getHints", game.getHints],
   ]);
 
   ws.on("message", (message: string) => {
@@ -42,7 +43,7 @@ wss.on("connection", (ws: WebSocket) => {
       let action = messageMap.get(result.type);
 
       if (action) {
-        let res = {seq: result.seq, data: action.call(game, result.data)}
+        let res = { seq: result.seq, data: action.call(game, result.data) };
         ws.send(JSON.stringify(res));
       }
     }
