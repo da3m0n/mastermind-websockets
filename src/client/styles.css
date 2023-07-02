@@ -1,6 +1,7 @@
 body {
     background: #e5e5e5;
 }
+
 header {
     display: flex;
     justify-content: center;
@@ -10,6 +11,7 @@ header > h1 {
     /*font-family: 'Cinzel', serif;*/
     font-size: 48px;
 }
+
 .board-wrapper {
     /*width: min(100vw, 40vh, 450px);*/
     /*max-width: var(--width); */
@@ -50,6 +52,7 @@ header > h1 {
 .controls button {
     margin: 2px;
 }
+
 .row-div {
     display: flex;
     flex-direction: row;
@@ -66,20 +69,6 @@ header > h1 {
     flex-direction: row;
 } */
 
-.peg {
-    border: 1px solid gray;
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    border-radius: 50%;
-    margin: 0 4px 0 0;
-    background: #ffffff;
-    filter: drop-shadow(3px 4px 3px gray);
-}
-
-.peg-input {
-    width: 30px;
-}
 
 .hints {
     display: grid;
@@ -99,28 +88,6 @@ header > h1 {
     border-radius: 50%;
 }
 
-.code-pegs {
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.code-peg {
-    display: flex;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 1px solid rgb(107, 106, 106);
-    margin-bottom: 12px;
-    filter: drop-shadow(2px 2px 4px #000000);
-}
-
-.code-peg span {
-    display: flex;
-    align-items: center;
-    font-size: 35px;
-    border: 0px solid black;
-}
 
 .overlay {
     background: red;
@@ -147,4 +114,65 @@ footer > button:hover {
     background: cornflowerblue;
     cursor: pointer;
     color: white;
+}
+
+.code-pegs {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.code-peg {
+    display: flex;
+    justify-content: center;
+    background: #ffffff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgb(107, 106, 106);
+    margin: 0 4px 12px 0;
+    filter: drop-shadow(2px 2px 4px #000000);
+    font-size: 35px;
+}
+
+.selected {
+    border: 0px solid red;
+}
+
+.code-peg input {
+    width: 35px;
+    border: 1px solid blue;
+    height: 20px;
+}
+
+.one {}
+.two{}
+.three{}
+.four{}
+.five{}
+.six{}
+
+.code-peg span {
+    display: flex;
+    align-items: center;
+    font-size: 35px;
+    border: 0px solid black;
+}
+
+.peg {
+    border: 1px solid gray;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border-radius: 50%;
+    margin: 0 4px 0 0;
+    background: #ffffff;
+    filter: drop-shadow(3px 4px 3px gray);
+}
+
+/*.peg-input {*/
+/*    width: 30px;*/
+/*}*/
+
+.one {
+
 }

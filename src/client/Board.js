@@ -2,7 +2,7 @@ class Board {
   constructor(rows, cols) {
     this._rows = rows;
     this._cols = cols;
-    this._colors = [
+    this._pegColors = [
       { id: 1, pegColor: "#18e7e7", pegTextColor: "#0aabab" },
       { id: 2, pegColor: "#07f007", pegTextColor: "#039c03" },
       { id: 3, pegColor: "#ff0000", pegTextColor: "#a10404" },
@@ -12,6 +12,12 @@ class Board {
     ];
     this.playerGuess = [];
     this.enableBtn = false;
+    document.addEventListener("keypress", (e) => {
+      let el = document.querySelector(`[data-key="${e.key}"`);
+      // ?.dispatchEvent(new MouseEvent("click", { cancelable: true }));
+
+      console.log("clicked", el);
+    });
   }
 
   makeBoard() {
@@ -19,7 +25,7 @@ class Board {
     for (let i = 0; i < this._rows; i++) {
       let rowDiv = createDom("div", { class: "row-div" });
       for (let j = 0; j < this._cols; j++) {
-        let peg = createDom("div", { class: "peg" });
+        let peg = createDom("div", { class: "code-peg selected" });
         let pegInput = createDom("input", {
           class: "peg-input",
           type: "number",
@@ -27,25 +33,32 @@ class Board {
           max: 6,
         });
 
-        pegInput.addEventListener("keydown", (e) => {
-          // this.playerGuess.push(e.key);
+        const pegTextSpan = createDom("span", { hidden: true });
 
-          if (e.keyCode >= 49 && e.keyCode <= 54) {
-            console.log(e.key, " ---> ", e.keyCode);
+        pegInput.addEventListener("keydown", (e) => {
+          if (
+            (e.keyCode >= 49 && e.keyCode <= 54) ||
+            (e.keyCode >= 97 && e.keyCode <= 102)
+          ) {
             this.playerGuess.push(e.key);
-          } else {
-            e.preventDefault();
-            return false;
+            const attributes = {
+              style:
+                "background: " +
+                this._pegColors[e.key - 1].pegColor +
+                "; color: " +
+                this._pegColors[e.key - 1].pegTextColor,
+            };
+            this.decorateCodePeg(peg, e.key, attributes);
           }
 
-          // if (this.playerGuess === 4) {
-          //   console.log("in here");
-          //   const btn = document.getElementById("checkCodeBtn");
-          //   btn.disabled = true;
-          //   this.enableBtn = true;
-          // }
+          // delete: 46 backspace: 8
+          if (e.keyCode === 8 || e.keyCode === 46) {
+            // @todo clear input field
+            this.playerGuess.pop();
+          }
+          console.log(e.key, " ---> ", e.keyCode, " --> ", this.playerGuess);
         });
-        peg.appendChild(pegInput);
+        // peg.appendChild(pegInput);
         rowDiv.appendChild(peg);
       }
 
@@ -123,20 +136,38 @@ class Board {
   makeCodePegs() {
     let codePegs = createDom("div", { class: "code-pegs" });
 
-    for (let i = 0; i < this._colors.length; i++) {
-      const color = this._colors[i];
+    for (let i = 0; i < this._pegColors.length; i++) {
+      const num = i + 1;
+      const color = this._pegColors[i];
       let pegBtn = createDom("button", {
         class: "code-peg",
-        style: "background: " + color.pegColor,
+        style:
+          "background: " + color.pegColor + "; color: " + color.pegTextColor,
+        "data-key": num,
+        value: num,
       });
-      let text = createDom("span", {
-        class: "peg-text",
-        style: "color: " + color.pegTextColor,
-      });
-      text.innerHTML = i + 1;
-      pegBtn.appendChild(text);
-      codePegs.appendChild(pegBtn);
+      pegBtn.innerHTML = num;
+
+      let pegBtn2 = createDom("div", { class: "code-peg" });
+      const attributes = {
+        "data-key": num,
+        value: num,
+        style:
+          "background: " + color.pegColor + "; color: " + color.pegTextColor,
+      };
+
+      this.decorateCodePeg(pegBtn2, num, attributes);
+
+      codePegs.appendChild(pegBtn2);
+      // codePegs.appendChild(pegBtn);
     }
     return codePegs;
+  }
+
+  decorateCodePeg(el, num, attributes) {
+    return Object.keys(attributes).forEach((attr) => {
+      el.setAttribute(attr, attributes[attr]);
+      el.innerHTML = num;
+    });
   }
 }
