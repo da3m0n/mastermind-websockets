@@ -88,6 +88,18 @@ header > h1 {
     border-radius: 50%;
 }
 
+.close {
+    background: #ffffff;
+}
+
+.exact {
+    background: #000000;
+}
+
+.hint-peg .missing {
+
+}
+
 
 .overlay {
     background: red;
@@ -143,13 +155,6 @@ footer > button:hover {
     border: 1px solid blue;
     height: 20px;
 }
-
-.one {}
-.two{}
-.three{}
-.four{}
-.five{}
-.six{}
 
 .code-peg span {
     display: flex;

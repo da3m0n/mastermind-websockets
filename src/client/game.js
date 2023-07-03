@@ -49,6 +49,6 @@ let generateNumbers = () => {
 
 class Game {
   constructor() {
-    let board = new Board(6, 4);
+    new Board(6, 4);
   }
 }

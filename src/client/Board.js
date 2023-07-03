@@ -1,8 +1,8 @@
 class Board {
   constructor(rows, cols) {
-    this._rows = rows;
-    this._cols = cols;
-    this._pegColors = [
+    this.rows = rows;
+    this.cols = cols;
+    this.pegColors_ = [
       { id: 1, pegColor: "#18e7e7", pegTextColor: "#0aabab" },
       { id: 2, pegColor: "#07f007", pegTextColor: "#039c03" },
       { id: 3, pegColor: "#ff0000", pegTextColor: "#a10404" },
@@ -10,65 +10,81 @@ class Board {
       { id: 5, pegColor: "#ffff00", pegTextColor: "#b2b230" },
       { id: 6, pegColor: "#9c27b0", pegTextColor: "#d83ef2" },
     ];
+
+    this.hintClasses = [
+      {
+        x: "exact",
+        c: "close",
+        _: "missing",
+      },
+    ];
+
     this.playerGuess = [];
     this.enableBtn = false;
 
     document.addEventListener("keypress", async (e) => {
-      let el = document.querySelector(`[data-key="${e.key}"`);
-      // ?.dispatchEvent(new MouseEvent("click", { cancelable: true }));
-
       let num = parseInt(e.key);
       if (num >= 1 && num <= 6) {
-        let row = this.board_[this.curRow_];
-        let cell = row[this.curCol_];
+        let row = this.board[this.curRow];
+        let cell = row[this.curCol];
 
         let attributes = {
           style:
             "background: " +
-            this._pegColors[num - 1].pegColor +
+            this.pegColors_[num - 1].pegColor +
             "; color: " +
-            this._pegColors[num - 1].pegTextColor,
+            this.pegColors_[num - 1].pegTextColor,
         };
         this.decorateCodePeg(cell.peg, num, attributes);
         cell.num = num;
 
-        if (this.curCol_ == 3) {
+        if (this.curCol === 3) {
           // send to server and check
           let res = await checkNumbers(row.map((x) => x.num));
-          console.log(
-            "checking result", res);
-          this.curRow_++;
+          console.log("checking result", res);
+          this.updateHints(res);
+          this.curRow++;
         }
-        this.curCol_ = (this.curCol_ + 1) % 4;
+        this.curCol = (this.curCol + 1) % 4;
+        console.log("this.curCol", this.curCol, "row", this.curRow);
       }
-      console.log("clicked", e.key);
     });
-    this.board_ = this.makeBoard();
-    this.curRow_ = 0;
-    this.curCol_ = 0;
+
+    this.board = this.makeBoard();
+    this.curRow = 0;
+    this.curCol = 0;
+  }
+
+  updateHints(hints) {
+    for (let i = 0; i < hints.length; i++) {
+      const hint = hints[i];
+      const peg = document.getElementById("hint-peg-" + (i + 1));
+      if (hint === "x") {
+        // peg.setAttribute("class", "exact");
+        peg.classList.add("exact");
+      } else if (hint === "c") {
+        // peg.setAttribute("class", "close");
+        peg.classList.add("close");
+      }
+      // else {
+      //   if (hint === "_") {
+      //     peg.setAttribute("class", "missing");
+      //   }
+      // }
+      // peg.setAttribute("class", "");
+    }
   }
 
   makeBoard() {
     let rows = [];
     let inputDiv = document.getElementById("input-div");
-    for (let i = 0; i < this._rows; i++) {
+    for (let i = 0; i < this.rows; i++) {
       let rowDiv = createDom("div", { class: "row-div" });
       let row = [];
       rows.push(row);
 
-      for (let j = 0; j < this._cols; j++) {
+      for (let j = 0; j < this.cols; j++) {
         let peg = createDom("div", { class: "code-peg" });
-
-        // const attributes = {
-        // style:
-        //   "background: " +
-        //   this._pegColors[e.key - 1].pegColor +
-        //   "; color: " +
-        //   this._pegColors[e.key - 1].pegTextColor,
-        // };
-        // this.decorateCodePeg(peg, e.key, attributes);
-
-        // peg.appendChild(pegInput);
         rowDiv.appendChild(peg);
         row.push({ peg, value: null });
       }
@@ -87,9 +103,9 @@ class Board {
       let data = {
         type: "create",
       };
-      // wss.send(JSON.stringify(data));
       new Game();
     });
+
     let boardWrapper = document.getElementsByTagName("footer")[0];
     boardWrapper.appendChild(generateNewBtn);
 
@@ -99,9 +115,16 @@ class Board {
   makeHints() {
     let hintsDiv = createDom("div", { class: "hints" });
 
-    for (let i = 0; i < this._cols; i++) {
+    for (let i = 0; i < this.cols; i++) {
       let name = "hint" + (i + 1);
-      let hintPeg = createDom("div", { class: "hint-peg " + name });
+      let hintPeg = createDom("div", {
+        id: "hint-peg-" + (i + 1),
+        class: "hint-peg " + name,
+      });
+      // const attributes = {
+      //   style:
+      //     "background: " + color.pegColor + "; color: " + color.pegTextColor,
+      // };
       hintsDiv.appendChild(hintPeg);
     }
     return hintsDiv;
@@ -115,12 +138,6 @@ class Board {
       // disabled: this.enableBtn,
     });
 
-    // checkButton.addEventListener("change", (e) => {
-    //   console.log("xxxx");
-    //   if (this.playerGuess === 4) {
-    //     console.log("chANGE BTN");
-    //   }
-    // });
     checkButton.innerHTML = "Check";
 
     let undoButton = createDom("button", { value: "undo", disabled: true });
@@ -148,9 +165,9 @@ class Board {
   makeCodePegs() {
     let codePegs = createDom("div", { class: "code-pegs" });
 
-    for (let i = 0; i < this._pegColors.length; i++) {
+    for (let i = 0; i < this.pegColors_.length; i++) {
       const num = i + 1;
-      const color = this._pegColors[i];
+      const color = this.pegColors_[i];
       let pegBtn = createDom("button", {
         class: "code-peg",
         style:
