@@ -12,60 +12,70 @@ class Board {
     ];
     this.playerGuess = [];
     this.enableBtn = false;
-    document.addEventListener("keypress", (e) => {
+
+    document.addEventListener("keypress", async (e) => {
       let el = document.querySelector(`[data-key="${e.key}"`);
       // ?.dispatchEvent(new MouseEvent("click", { cancelable: true }));
 
-      console.log("clicked", el);
+      let num = parseInt(e.key);
+      if (num >= 1 && num <= 6) {
+        let row = this.board_[this.curRow_];
+        let cell = row[this.curCol_];
+
+        let attributes = {
+          style:
+            "background: " +
+            this._pegColors[num - 1].pegColor +
+            "; color: " +
+            this._pegColors[num - 1].pegTextColor,
+        };
+        this.decorateCodePeg(cell.peg, num, attributes);
+        cell.num = num;
+
+        if (this.curCol_ == 3) {
+          // send to server and check
+          let res = await checkNumbers(row.map((x) => x.num));
+          console.log(
+            "checking result", res);
+          this.curRow_++;
+        }
+        this.curCol_ = (this.curCol_ + 1) % 4;
+      }
+      console.log("clicked", e.key);
     });
+    this.board_ = this.makeBoard();
+    this.curRow_ = 0;
+    this.curCol_ = 0;
   }
 
   makeBoard() {
+    let rows = [];
     let inputDiv = document.getElementById("input-div");
     for (let i = 0; i < this._rows; i++) {
       let rowDiv = createDom("div", { class: "row-div" });
+      let row = [];
+      rows.push(row);
+
       for (let j = 0; j < this._cols; j++) {
-        let peg = createDom("div", { class: "code-peg selected" });
-        let pegInput = createDom("input", {
-          class: "peg-input",
-          type: "number",
-          min: 1,
-          max: 6,
-        });
+        let peg = createDom("div", { class: "code-peg" });
 
-        const pegTextSpan = createDom("span", { hidden: true });
+        // const attributes = {
+        // style:
+        //   "background: " +
+        //   this._pegColors[e.key - 1].pegColor +
+        //   "; color: " +
+        //   this._pegColors[e.key - 1].pegTextColor,
+        // };
+        // this.decorateCodePeg(peg, e.key, attributes);
 
-        pegInput.addEventListener("keydown", (e) => {
-          if (
-            (e.keyCode >= 49 && e.keyCode <= 54) ||
-            (e.keyCode >= 97 && e.keyCode <= 102)
-          ) {
-            this.playerGuess.push(e.key);
-            const attributes = {
-              style:
-                "background: " +
-                this._pegColors[e.key - 1].pegColor +
-                "; color: " +
-                this._pegColors[e.key - 1].pegTextColor,
-            };
-            this.decorateCodePeg(peg, e.key, attributes);
-          }
-
-          // delete: 46 backspace: 8
-          if (e.keyCode === 8 || e.keyCode === 46) {
-            // @todo clear input field
-            this.playerGuess.pop();
-          }
-          console.log(e.key, " ---> ", e.keyCode, " --> ", this.playerGuess);
-        });
         // peg.appendChild(pegInput);
         rowDiv.appendChild(peg);
+        row.push({ peg, value: null });
       }
 
       rowDiv.appendChild(this.makeControls());
       rowDiv.appendChild(this.makeHints());
       inputDiv.appendChild(rowDiv);
-      // <button type="button" .onClick="generateNumbers()">Generate New</button>
     }
 
     let grid = document.getElementsByClassName("board")[0];
@@ -82,6 +92,8 @@ class Board {
     });
     let boardWrapper = document.getElementsByTagName("footer")[0];
     boardWrapper.appendChild(generateNewBtn);
+
+    return rows;
   }
 
   makeHints() {

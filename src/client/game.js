@@ -33,9 +33,12 @@ class MessageHandler {
   }
 }
 let messages = new MessageHandler();
+3;
 
-let checkNumbers = async () => {
-  console.log(await messages.rpc("check", [1, 2, 4, 5]));
+let checkNumbers = async (nums) => {
+  let answer = await messages.rpc("check", nums);
+  console.log("checking these...", nums);
+  return answer;
 };
 
 let generateNumbers = () => {
@@ -47,6 +50,5 @@ let generateNumbers = () => {
 class Game {
   constructor() {
     let board = new Board(6, 4);
-    board.makeBoard();
   }
 }

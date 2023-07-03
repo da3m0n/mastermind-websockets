@@ -8,9 +8,9 @@ export class ServerGame {
   }
 
   check(playerGuess: number[]) {
-    playerGuess = [5, 4, 6, 1];
-    // let code = [1, 3, 6, 2];
-    console.log("solution", this.solution);
+    console.log("in check()", playerGuess);
+
+    this.solution = [1, 3, 6, 2];
 
     let res = Array<string>(4).fill("_");
     let notExactMatch = new Set<number>();
