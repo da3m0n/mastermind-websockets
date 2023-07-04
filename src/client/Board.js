@@ -18,14 +18,21 @@ class Board {
         _: "missing",
       },
     ];
+    this.board = this.makeBoard();
 
     this.playerGuess = [];
     this.enableBtn = false;
+    // this.selectedRow = 0;
+    this.curRow = 0;
+    this.curCol = 0;
+
+    // this.updateActiveRow(this.curRow);
 
     document.addEventListener("keypress", async (e) => {
       let num = parseInt(e.key);
       if (num >= 1 && num <= 6) {
-        let row = this.board[this.curRow];
+        let row = this.board.rows[this.curRow];
+        let rowDiv = this.board.rowsDiv[this.curRow];
         let cell = row[this.curCol];
 
         let attributes = {
@@ -41,45 +48,39 @@ class Board {
         if (this.curCol === 3) {
           // send to server and check
           let res = await checkNumbers(row.map((x) => x.num));
-          console.log("checking result", res);
-          this.updateHints(res);
+          this.updateHints(res, rowDiv);
           this.curRow++;
         }
         this.curCol = (this.curCol + 1) % 4;
         console.log("this.curCol", this.curCol, "row", this.curRow);
       }
     });
-
-    this.board = this.makeBoard();
-    this.curRow = 0;
-    this.curCol = 0;
   }
 
-  updateHints(hints) {
-    for (let i = 0; i < hints.length; i++) {
-      const hint = hints[i];
-      const peg = document.getElementById("hint-peg-" + (i + 1));
+  updateHints(hints, currRow) {
+    const row = currRow.rowDiv.querySelectorAll("div[id]");
+    console.log("row", row);
+    row.forEach((r, i) => {
+      let hint = hints[i];
       if (hint === "x") {
         // peg.setAttribute("class", "exact");
-        peg.classList.add("exact");
+        r.classList.add("exact");
       } else if (hint === "c") {
         // peg.setAttribute("class", "close");
-        peg.classList.add("close");
+        r.classList.add("close");
       }
-      // else {
-      //   if (hint === "_") {
-      //     peg.setAttribute("class", "missing");
-      //   }
-      // }
-      // peg.setAttribute("class", "");
-    }
+    });
   }
 
   makeBoard() {
     let rows = [];
+    let rowsDiv = [];
+
     let inputDiv = document.getElementById("input-div");
     for (let i = 0; i < this.rows; i++) {
       let rowDiv = createDom("div", { class: "row-div" });
+
+      let row2 = [];
       let row = [];
       rows.push(row);
 
@@ -91,6 +92,8 @@ class Board {
 
       rowDiv.appendChild(this.makeControls());
       rowDiv.appendChild(this.makeHints());
+      // this.row.push([{ rowDiv }]);
+      rowsDiv.push({ rowDiv });
       inputDiv.appendChild(rowDiv);
     }
 
@@ -109,7 +112,8 @@ class Board {
     let boardWrapper = document.getElementsByTagName("footer")[0];
     boardWrapper.appendChild(generateNewBtn);
 
-    return rows;
+    // return rows;
+    return { rows, rowsDiv };
   }
 
   makeHints() {
