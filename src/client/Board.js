@@ -25,12 +25,15 @@ class Board {
     // this.selectedRow = 0;
     this.curRow = 0;
     this.curCol = 0;
+    this.guesses = new Set();
 
     // this.updateActiveRow(this.curRow);
 
     document.addEventListener("keypress", async (e) => {
       let num = parseInt(e.key);
-      if (num >= 1 && num <= 6) {
+
+      if (num >= 1 && num <= 6 && !this.guesses.has(num)) {
+        this.guesses.add(num);
         let row = this.board.rows[this.curRow];
         let rowDiv = this.board.rowsDiv[this.curRow];
         let cell = row[this.curCol];
@@ -50,6 +53,7 @@ class Board {
           let res = await checkNumbers(row.map((x) => x.num));
           this.updateHints(res, rowDiv);
           this.curRow++;
+          this.guesses.clear();
         }
         this.curCol = (this.curCol + 1) % 4;
         console.log("this.curCol", this.curCol, "row", this.curRow);

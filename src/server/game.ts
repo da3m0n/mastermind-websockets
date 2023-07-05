@@ -7,11 +7,13 @@ export class ServerGame {
     this.solution = generateRandomNumbers();
   }
 
-  check(playerGuess: number[]) {
-    console.log("in check()", playerGuess);
-
+  check(playerGuess: number[]): { res: string[]; message: string } {
     this.solution = [1, 3, 6, 2];
+    this.previousGuesses.push(playerGuess);
 
+    if (this.previousGuesses.length === 2) {
+      console.log("game over");
+    }
     let res = Array<string>(4).fill("_");
     let notExactMatch = new Set<number>();
 
@@ -31,8 +33,10 @@ export class ServerGame {
         res[i] = notExactMatch.has(num) ? "c" : "_";
       }
     }
-    console.log("res", res);
-    return res;
+    const message = "weeener";
+    // console.log("res", res);
+    // return res;
+    return { res, message };
   }
 
   getHints() {}
