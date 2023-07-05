@@ -38,7 +38,8 @@ let messages = new MessageHandler();
 let checkNumbers = async (nums) => {
   let answer = await messages.rpc("check", nums);
   console.log("checking these...", nums, answer);
-  return answer.res;
+  // return answer.res;
+  return { res: answer.res, message: answer.message };
 };
 
 let generateNumbers = () => {

@@ -34,9 +34,9 @@ class Board {
 
       if (num >= 1 && num <= 6 && !this.guesses.has(num)) {
         this.guesses.add(num);
-        let row = this.board.rows[this.curRow];
+        let codePegRow = this.board.codePegRow[this.curRow];
         let rowDiv = this.board.rowsDiv[this.curRow];
-        let cell = row[this.curCol];
+        let cell = codePegRow[this.curCol];
 
         let attributes = {
           style:
@@ -50,8 +50,12 @@ class Board {
 
         if (this.curCol === 3) {
           // send to server and check
-          let res = await checkNumbers(row.map((x) => x.num));
-          this.updateHints(res, rowDiv);
+          let res = await checkNumbers(codePegRow.map((x) => x.num));
+
+          this.updateHints(res.res, rowDiv);
+          if (res.res.join("") === "xxxx") {
+            this.makeWinnerBanner(res.message);
+          }
           this.curRow++;
           this.guesses.clear();
         }
@@ -59,6 +63,18 @@ class Board {
         console.log("this.curCol", this.curCol, "row", this.curRow);
       }
     });
+  }
+
+  makeWinnerBanner(message) {
+    const banner = createDom("div");
+    const solutionDiv = document.getElementById("solution");
+    solutionDiv.removeAttribute("hidden");
+    const text = createDom("p", { class: "banner-text" });
+    text.innerHTML = message;
+    banner.appendChild(text);
+
+    solutionDiv.appendChild(banner);
+    console.log("show div");
   }
 
   updateHints(hints, currRow) {
@@ -77,7 +93,7 @@ class Board {
   }
 
   makeBoard() {
-    let rows = [];
+    let codePegRow = [];
     let rowsDiv = [];
 
     let inputDiv = document.getElementById("input-div");
@@ -86,7 +102,7 @@ class Board {
 
       let row2 = [];
       let row = [];
-      rows.push(row);
+      codePegRow.push(row);
 
       for (let j = 0; j < this.cols; j++) {
         let peg = createDom("div", { class: "code-peg" });
@@ -117,7 +133,7 @@ class Board {
     boardWrapper.appendChild(generateNewBtn);
 
     // return rows;
-    return { rows, rowsDiv };
+    return { codePegRow, rowsDiv };
   }
 
   makeHints() {

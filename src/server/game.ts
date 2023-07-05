@@ -8,7 +8,7 @@ export class ServerGame {
   }
 
   check(playerGuess: number[]): { res: string[]; message: string } {
-    this.solution = [1, 3, 6, 2];
+    // this.solution = [1, 3, 6, 2];
     this.previousGuesses.push(playerGuess);
 
     if (this.previousGuesses.length === 2) {
@@ -33,7 +33,7 @@ export class ServerGame {
         res[i] = notExactMatch.has(num) ? "c" : "_";
       }
     }
-    const message = "weeener";
+    const message = "Weeener Weener Chicken Dinner!!!";
     // console.log("res", res);
     // return res;
     return { res, message };

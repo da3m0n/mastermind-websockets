@@ -180,3 +180,11 @@ footer > button:hover {
 .current {
   border: 1px solid red;
 }
+
+.solution {
+  border: 1px solid gray;
+  height: 50px;
+  margin: 10px 0 10px 0;
+  background: #efefef;
+  filter: drop-shadow(3px 4px 3px gray);
+}
