@@ -1,5 +1,5 @@
 export class ServerGame {
-  private previousGuesses: number[][];
+  private previousGuesses: string[][];
   private solution: number[];
 
   constructor() {
@@ -8,11 +8,14 @@ export class ServerGame {
   }
 
   check(playerGuess: number[]): { res: string[]; message: string } {
-    // this.solution = [1, 3, 6, 2];
-    this.previousGuesses.push(playerGuess);
+    this.solution = [1, 3, 6, 2];
+    // this.previousGuesses.push(playerGuess);
+
+    let message = "";
 
     if (this.previousGuesses.length === 2) {
       console.log("game over");
+      message = "Game Over!";
     }
     let res = Array<string>(4).fill("_");
     let notExactMatch = new Set<number>();
@@ -33,13 +36,26 @@ export class ServerGame {
         res[i] = notExactMatch.has(num) ? "c" : "_";
       }
     }
-    const message = "Weeener Weener Chicken Dinner!!!";
+    this.previousGuesses.push(res);
     // console.log("res", res);
     // return res;
+    this.checkforWin(res);
+    if (res.join("").toString() === "xxxx") {
+      message = "Weener Weener Chicken Deeener!!!";
+    }
     return { res, message };
   }
 
-  getHints() {}
+  private checkforWin(res: string[]) {
+    return res.join("").toString() === "xxxx";
+  }
+
+  getHints() {
+    console.log("get hints");
+  }
+  newGame() {
+    console.log("new Game in game.ts");
+  }
 }
 
 function generateRandomNumbers(): number[] {

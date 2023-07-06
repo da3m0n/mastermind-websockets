@@ -42,6 +42,10 @@ let checkNumbers = async (nums) => {
   return { res: answer.res, message: answer.message };
 };
 
+let startNewGame = async () => {
+  console.log("in startGame in game.js");
+  await messages.rpc("newGame");
+};
 let generateNumbers = () => {
   console.log("generateNumbers...");
   let data = { type: "getCode" };

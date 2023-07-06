@@ -35,6 +35,7 @@ wss.on("connection", (ws: WebSocket) => {
     ],
     ["check", game.check],
     ["getHints", game.getHints],
+    ["newGame", game.newGame],
   ]);
 
   ws.on("message", (message: string) => {

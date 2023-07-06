@@ -126,7 +126,8 @@ class Board {
       let data = {
         type: "create",
       };
-      new Game();
+      // new Game();
+      startNewGame();
     });
 
     let boardWrapper = document.getElementsByTagName("footer")[0];
