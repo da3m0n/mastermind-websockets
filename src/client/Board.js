@@ -9,7 +9,10 @@ class Board {
       { id: 4, pegColor: "#065798eb", pegTextColor: "#0486ee" },
       { id: 5, pegColor: "#ffff00", pegTextColor: "#b2b230" },
       { id: 6, pegColor: "#9c27b0", pegTextColor: "#d83ef2" },
+      { id: 7, pegColor: "#0e7c8c", pegTextColor: "#d7ced9" },
     ];
+
+    // new Game();
 
     this.hintClasses = [
       {
@@ -29,10 +32,14 @@ class Board {
 
     // this.updateActiveRow(this.curRow);
 
-    document.addEventListener("keypress", async (e) => {
+    document.addEventListener("keypress", this.handleKeyboardInput());
+  }
+
+  handleKeyboardInput() {
+    return async (e) => {
       let num = parseInt(e.key);
 
-      if (num >= 1 && num <= 6 && !this.guesses.has(num)) {
+      if (num >= 1 && num <= 7 && !this.guesses.has(num)) {
         this.guesses.add(num);
         let codePegRow = this.board.codePegRow[this.curRow];
         let rowDiv = this.board.rowsDiv[this.curRow];
@@ -48,33 +55,52 @@ class Board {
         this.decorateCodePeg(cell.peg, num, attributes);
         cell.num = num;
 
-        if (this.curCol === 3) {
+        if (this.curCol === this.cols - 1) {
           // send to server and check
           let res = await checkNumbers(codePegRow.map((x) => x.num));
 
           this.updateHints(res.res, rowDiv);
-          if (res.res.join("") === "xxxx") {
-            this.makeWinnerBanner(res.message);
+          if (res.state === 1) {
+            this.makeBanner("Weener weener cheekun dinner!!", res);
+          } else if (res.state === 2) {
+            this.makeBanner("You have lost!@!", res);
+            // this.showSolution(res.solution);
           }
           this.curRow++;
           this.guesses.clear();
         }
-        this.curCol = (this.curCol + 1) % 4;
+        this.curCol = (this.curCol + 1) % this.cols;
         console.log("this.curCol", this.curCol, "row", this.curRow);
       }
-    });
+    };
   }
 
-  makeWinnerBanner(message) {
+  showSolution(solution) {}
+
+  makeBanner(message, res) {
     const banner = createDom("div");
     const solutionDiv = document.getElementById("solution");
     solutionDiv.removeAttribute("hidden");
-    const text = createDom("p", { class: "banner-text" });
-    text.innerHTML = message;
+    const text = createDom("p", { class: "banner-text" }, message);
     banner.appendChild(text);
+    solutionDiv.style.display = "flex";
 
-    solutionDiv.appendChild(banner);
-    console.log("show div");
+    if (res.solution !== undefined) {
+      for (let i = 0; i < res.solution.length; i++) {
+        const re = res[i];
+        const color = this.pegColors_[res.solution[i] - 1];
+        const peg = createDom("div", { class: "code-peg" });
+        const attributes = {
+          style:
+            "background: " + color.pegColor + "; color: " + color.pegTextColor,
+        };
+
+        this.decorateCodePeg(peg, res.solution[i], attributes);
+        solutionDiv.appendChild(peg);
+      }
+    } else {
+      solutionDiv.appendChild(banner);
+    }
   }
 
   updateHints(hints, currRow) {
@@ -99,42 +125,59 @@ class Board {
     let inputDiv = document.getElementById("input-div");
     for (let i = 0; i < this.rows; i++) {
       let rowDiv = createDom("div", { class: "row-div" });
-
-      let row2 = [];
+      let pegDiv = createDom("div", { class: "code-peg-div" });
       let row = [];
+
       codePegRow.push(row);
 
       for (let j = 0; j < this.cols; j++) {
         let peg = createDom("div", { class: "code-peg" });
-        rowDiv.appendChild(peg);
+        pegDiv.appendChild(peg);
         row.push({ peg, value: null });
       }
 
+      rowDiv.appendChild(pegDiv);
       rowDiv.appendChild(this.makeControls());
       rowDiv.appendChild(this.makeHints());
-      // this.row.push([{ rowDiv }]);
       rowsDiv.push({ rowDiv });
       inputDiv.appendChild(rowDiv);
     }
 
     let grid = document.getElementsByClassName("board")[0];
-    grid.appendChild(this.makeCodePegs());
+    grid.appendChild(this.makeCodePegs(this.pegColors_.length));
 
-    let generateNewBtn = createDom("button");
-    generateNewBtn.innerHTML = "New Game";
-    generateNewBtn.addEventListener("click", () => {
+    let generateNewBtn = createDom("button", {}, "New Game");
+
+    generateNewBtn.addEventListener("click", async () => {
       let data = {
         type: "create",
       };
-      // new Game();
-      startNewGame();
+      new Game();
+      let res = await startNewGame();
+      if (res.state === 3) {
+        console.log("new game xx", res);
+        this.removeStyles();
+      }
     });
 
     let boardWrapper = document.getElementsByTagName("footer")[0];
     boardWrapper.appendChild(generateNewBtn);
 
-    // return rows;
     return { codePegRow, rowsDiv };
+  }
+
+  removeStyles() {
+    const codePegDiv = document.getElementsByClassName("code-peg-div");
+
+    for (const div in codePegDiv) {
+      for (const peg in codePegDiv[div].childNodes) {
+        const pegDiv = codePegDiv[div].childNodes[peg];
+        if (pegDiv.style !== undefined) {
+          pegDiv.removeAttribute("style");
+          pegDiv.innerHTML = "";
+        }
+      }
+    }
   }
 
   makeHints() {
@@ -193,16 +236,8 @@ class Board {
     for (let i = 0; i < this.pegColors_.length; i++) {
       const num = i + 1;
       const color = this.pegColors_[i];
-      let pegBtn = createDom("button", {
-        class: "code-peg",
-        style:
-          "background: " + color.pegColor + "; color: " + color.pegTextColor,
-        "data-key": num,
-        value: num,
-      });
-      pegBtn.innerHTML = num;
 
-      let pegBtn2 = createDom("div", { class: "code-peg" });
+      let pegBtn = createDom("div", { class: "code-peg" });
       const attributes = {
         "data-key": num,
         value: num,
@@ -210,10 +245,9 @@ class Board {
           "background: " + color.pegColor + "; color: " + color.pegTextColor,
       };
 
-      this.decorateCodePeg(pegBtn2, num, attributes);
+      this.decorateCodePeg(pegBtn, num, attributes);
 
-      codePegs.appendChild(pegBtn2);
-      // codePegs.appendChild(pegBtn);
+      codePegs.appendChild(pegBtn);
     }
     return codePegs;
   }

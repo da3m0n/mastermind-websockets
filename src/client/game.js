@@ -33,19 +33,20 @@ class MessageHandler {
   }
 }
 let messages = new MessageHandler();
-3;
 
 let checkNumbers = async (nums) => {
   let answer = await messages.rpc("check", nums);
   console.log("checking these...", nums, answer);
   // return answer.res;
-  return { res: answer.res, message: answer.message };
+  return { res: answer.res, state: answer.state, solution: answer.solution };
 };
 
 let startNewGame = async () => {
-  console.log("in startGame in game.js");
-  await messages.rpc("newGame");
+  let answer = await messages.rpc("newGame");
+  console.log("in startGame in game.js", answer);
+  return { state: answer.state };
 };
+
 let generateNumbers = () => {
   console.log("generateNumbers...");
   let data = { type: "getCode" };
@@ -54,6 +55,7 @@ let generateNumbers = () => {
 
 class Game {
   constructor() {
-    new Board(6, 4);
+    // new Board(6, 4);
+    startNewGame();
   }
 }

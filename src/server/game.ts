@@ -1,22 +1,28 @@
 export class ServerGame {
   private previousGuesses: string[][];
   private solution: number[];
+  private STATE = {
+    playing: 0,
+    won: 1,
+    lost: 2,
+    new: 3,
+  };
 
   constructor() {
     this.previousGuesses = [];
     this.solution = generateRandomNumbers();
   }
 
-  check(playerGuess: number[]): { res: string[]; message: string } {
-    this.solution = [1, 3, 6, 2];
+  check(playerGuess: number[]): {
+    res: string[];
+    state: number;
+    solution?: number[];
+  } {
+    // this.solution = [1, 3, 6, 2];
     // this.previousGuesses.push(playerGuess);
 
     let message = "";
 
-    if (this.previousGuesses.length === 2) {
-      console.log("game over");
-      message = "Game Over!";
-    }
     let res = Array<string>(4).fill("_");
     let notExactMatch = new Set<number>();
 
@@ -37,29 +43,41 @@ export class ServerGame {
       }
     }
     this.previousGuesses.push(res);
-    // console.log("res", res);
-    // return res;
-    this.checkforWin(res);
-    if (res.join("").toString() === "xxxx") {
-      message = "Weener Weener Chicken Deeener!!!";
-    }
-    return { res, message };
-  }
 
-  private checkforWin(res: string[]) {
-    return res.join("").toString() === "xxxx";
+    if (res.join("").toString() === "xxxx") {
+      return {
+        res,
+        state: this.STATE.won,
+      };
+    }
+
+    if (this.previousGuesses.length === 6) {
+      const obj = {
+        res,
+        state: this.STATE.lost,
+        solution: this.solution,
+      };
+      console.log("solution", obj);
+      return obj;
+    }
+    return { res, state: this.STATE.playing };
   }
 
   getHints() {
     console.log("get hints");
   }
-  newGame() {
+
+  newGame(): { state: number } {
     console.log("new Game in game.ts");
+    new ServerGame();
+    return {
+      state: this.STATE.new,
+    };
   }
 }
 
 function generateRandomNumbers(): number[] {
-  let arr: number[] = [1, 2, 3, 4, 5, 6];
+  let arr: number[] = [1, 2, 3, 4, 5, 6, 7];
   let res = new Set<number>();
 
   while (res.size < 4) {

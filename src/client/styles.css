@@ -61,6 +61,10 @@ header > h1 {
   margin-bottom: 10px; */
 }
 
+.code-peg-div {
+  display: flex;
+  flex-direction: row;
+}
 .grid > .selected {
   border: 1px solid red;
 }
@@ -182,8 +186,10 @@ footer > button:hover {
 }
 
 .solution {
+  display: none;
+  flex-direction: row;
   border: 1px solid gray;
-  height: 50px;
+  /*height: 50px;*/
   margin: 10px 0 10px 0;
   background: #efefef;
   filter: drop-shadow(3px 4px 3px gray);
