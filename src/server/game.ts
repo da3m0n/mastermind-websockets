@@ -1,22 +1,22 @@
 export class ServerGame {
   private previousGuesses: string[][];
   private solution: number[];
-
+  private STATE = {
+    playing: 0,
+    won: 1,
+    lost: 2,
+  };
   constructor() {
     this.previousGuesses = [];
     this.solution = generateRandomNumbers();
   }
 
-  check(playerGuess: number[]): { res: string[]; message: string } {
+  check(playerGuess: number[]): { res: string[]; state: number } {
     this.solution = [1, 3, 6, 2];
     // this.previousGuesses.push(playerGuess);
 
     let message = "";
 
-    if (this.previousGuesses.length === 2) {
-      console.log("game over");
-      message = "Game Over!";
-    }
     let res = Array<string>(4).fill("_");
     let notExactMatch = new Set<number>();
 
@@ -37,13 +37,20 @@ export class ServerGame {
       }
     }
     this.previousGuesses.push(res);
-    // console.log("res", res);
-    // return res;
-    this.checkforWin(res);
-    if (res.join("").toString() === "xxxx") {
-      message = "Weener Weener Chicken Deeener!!!";
+
+    if (this.previousGuesses.length === 2) {
+      return {
+        res,
+        state: this.STATE.lost,
+      };
     }
-    return { res, message };
+    if (res.join("").toString() === "xxxx") {
+      return {
+        res,
+        state: this.STATE.won,
+      };
+    }
+    return { res, state: this.STATE.playing };
   }
 
   private checkforWin(res: string[]) {

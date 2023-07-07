@@ -11,6 +11,8 @@ class Board {
       { id: 6, pegColor: "#9c27b0", pegTextColor: "#d83ef2" },
     ];
 
+    // new Game();
+
     this.hintClasses = [
       {
         x: "exact",
@@ -48,18 +50,18 @@ class Board {
         this.decorateCodePeg(cell.peg, num, attributes);
         cell.num = num;
 
-        if (this.curCol === 3) {
+        if (this.curCol === this.cols - 1) {
           // send to server and check
           let res = await checkNumbers(codePegRow.map((x) => x.num));
 
           this.updateHints(res.res, rowDiv);
-          if (res.res.join("") === "xxxx") {
-            this.makeWinnerBanner(res.message);
+          if (res.state === 1) {
+            this.makeWinnerBanner("Weener weener cheekun dinner!!");
           }
           this.curRow++;
           this.guesses.clear();
         }
-        this.curCol = (this.curCol + 1) % 4;
+        this.curCol = (this.curCol + 1) % this.cols;
         console.log("this.curCol", this.curCol, "row", this.curRow);
       }
     });

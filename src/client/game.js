@@ -39,7 +39,7 @@ let checkNumbers = async (nums) => {
   let answer = await messages.rpc("check", nums);
   console.log("checking these...", nums, answer);
   // return answer.res;
-  return { res: answer.res, message: answer.message };
+  return { res: answer.res, state: answer.state };
 };
 
 let startNewGame = async () => {
